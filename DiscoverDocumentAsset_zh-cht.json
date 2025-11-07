@@ -1,0 +1,261 @@
+﻿{
+    "discoverContents": [
+        {
+            "Name": "How to build a Player",
+            "UniqueKey": "How to build a Player",
+            "Description": "若想為此 Demo 建立可執行檔，請從選單選擇「File → Build Frontend」開啟建置介面。\n\n開啟視窗後，選擇你想要的 Build Profile，再點擊「Build Selected」或「+Run」即可建置，完成後還能選擇直接執行。",
+            "Sections": []
+        },
+        {
+            "Name": "Spaceship Demo",
+            "UniqueKey": "Spaceship Demo",
+            "Description": "這組場景包含《太空船 Demo》的完整遊玩流程。本視窗將帶你走遍所有階段，並讓你快速存取構成 Demo 的各個元素。\n\n<i>若你在 Inspector 看到這段說明，可透過「Help → Discover Spaceship Demo」更輕鬆地導覽</i>",
+            "Sections": [
+                {
+                    "Name": "Navigating the Walkthrough",
+                    "Description": "點擊視窗左側的清單項目，即可跳轉到場景各區塊。\n\n導覽分為幾大類：\n\n<b>Demo Scripted Events</b> 是定義從 Demo 開頭到結尾完整流程的類別。\n\n<b>Visual Effects</b> 是所有 VFX 相關內容的專區，包含通用特效與系統，以下為重點位置清單。"
+                }
+            ]
+        },
+        {
+            "Name": "Floating Dust",
+            "UniqueKey": "Floating Dust",
+            "Description": "為了營造濃厚大氣感，玩家周圍會生成受光漂浮塵埃，並隨玩家在關卡中移動而變化。",
+            "Sections": [
+                {
+                    "Name": "Floating Dust",
+                    "Description": "此特效會在玩家攝影機周圍生成粒子，已自動綁定到 Main Camera，無需額外設定。"
+                },
+                {
+                    "Name": "VFXVolumeMixer Setup",
+                    "Description": "各 Volume 已設定讓漂浮塵埃隨關卡進展改變環境色、密度與透明度。"
+                }
+            ]
+        },
+        {
+            "Name": "Other Ambient Effects",
+            "UniqueKey": "Other Ambient Effects",
+            "Description": "環境特效讓場景更有動態感，讓太空船顯得真實而生機勃勃。全船到處都有這些小細節。",
+            "Sections": [
+                {
+                    "Name": "Root objects for every Room",
+                    "Description": "所有特效都以房間為單位，用根物件整理分類。"
+                }
+            ]
+        },
+        {
+            "Name": "Steam Leaks",
+            "UniqueKey": "Steam Leaks",
+            "Description": "蒸汽洩漏是相當直觀的特效，從破損通風管噴出空氣粒子。\n\n這些特效使用簡化光照模型，搭配 Light Probe 運作。",
+            "Sections": [
+                {
+                    "Name": "Steam Leak (Directional)",
+                    "Description": "簡單的雙發射器特效。"
+                }
+            ]
+        },
+        {
+            "Name": "Sparkles (Shake)",
+            "UniqueKey": "Sparkles (Shake)",
+            "Description": "遊戲會定期透過廣播訊息觸發場景震動，所有物件都能接收並回應。\n\n為了高效生成火花，我們實作了一個「多來源單模擬」系統。",
+            "Sections": [
+                {
+                    "Name": "The Shake Sparkle Effect (for the First Corridor)",
+                    "Description": "這是精簡版火花特效（無碰撞、粒子少、無噪點）。\n\n每顆火花都透過參數綁定器接收一組 Transform 座標。"
+                }
+            ]
+        },
+        {
+            "Name": "Big Sparkle Bursts",
+            "UniqueKey": "Big Sparkle Bursts",
+            "Description": "走廊中放置了數個大型火花爆發特效，它們不回應震動，而是自行發射粒子。",
+            "Sections": [
+                {
+                    "Name": "Sparkle Effects",
+                    "Description": "同步發射的簡單火花，發射由外部物件控制，會同時觸發：\n- VFX 事件\n- 隨機音效\n- 聚光燈閃光（閃完自動關閉）"
+                }
+            ]
+        },
+        {
+            "Name": "Intro : Elevator",
+            "UniqueKey": "Intro : Elevator",
+            "Description": "電梯開場將玩家帶入太空船環境。雖然不是可遊玩區段，但會初始化 HUD 並播放 Timeline 動畫。",
+            "Sections": [
+                {
+                    "Name": "Intro Timeline",
+                    "Description": "整合所有動畫、音效與腳本，負責整個開場序列。"
+                },
+                {
+                    "Name": "Animated Door (Intro Specific)",
+                    "Description": "門的開啟動畫由通用範本呼叫，開門時會生成粒子（每扇門皆附 Visual Effect）。\n\nVFX 使用「Spawn Over Distance」區塊，根據 Timeline 動畫計算門速與粒子速度。"
+                },
+                {
+                    "Name": "HUD Activation",
+                    "Description": "HUD 本身也是粒子特效。\n\n開場 Timeline 會廣播訊息，由 VirtualCameraManager 接收，觸發 <b>InitSequence</b> 事件，生成文字與高光。"
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Alert",
+            "UniqueKey": "HoloTable : Alert",
+            "Description": "警報模式是導覽最後階段，持續 30 秒。飛彈擊中飛船，全息桌顯示我方與敵艦戰鬥概況。\n\n序列以巨大撞擊結束，淡入全黑。",
+            "Sections": [
+                {
+                    "Name": "Alert Sequence",
+                    "Description": "突然中斷搜尋降落點，切換顯示戰鬥地圖。\n\n環境分為兩組 VFX（格線 + 雲霧/小行星），合併成主 VFX 以提升可讀性。\n\n戰艦為 ARUI-Battleship VFX 的不同設定版本。"
+                },
+                {
+                    "Name": "Destructibles",
+                    "Description": "攻擊期間，橋艙內道具會陸續啟動以模擬破壞。主狀態機負責推進，每次收到 HIT_STRONG 訊息（飛彈命中）就會前進一個狀態，製造更多混亂。\n\n場景中有三大可破壞物：\n- 掉落電纜（啟動後撕裂、隨震動產生粒子）\n- 掉落金屬板（純剛體）\n- 蒸汽爆發（單顆火花 + 放大版蒸汽洩漏）"
+                },
+                {
+                    "Name": "In Parallel : Core Room",
+                    "Description": "攻擊期間，核心室能量耗盡並崩毀。此區塊說明如何與主 Timeline 保持同步。"
+                }
+            ]
+        },
+        {
+            "Name": "Security Terminal",
+            "UniqueKey": "Security Terminal",
+            "Description": "通過第一走廊後，你會遇到第一個互動物件——安全終端機。\n\n房間中央有一個可互動的發光點。靠近時 HUD 準星會出現，點擊即可選取。",
+            "Sections": [
+                {
+                    "Name": "Interactive Item",
+                    "Description": "半空中那個小光點是互動物件，會對玩家準星做出反應。懸停時會觸發動畫與狀態變更，視覺由 Visual Effect 實現（使用布林值屬性 ARUI-Hover）"
+                },
+                {
+                    "Name": "Security Terminal Sequence",
+                    "Description": "啟動互動物件後開始安全終端機序列。\n\n這是一段 Timeline，會同時啟動多個特效。"
+                },
+                {
+                    "Name": "Door Openning (After Sequence)",
+                    "Description": "序列結束後，右側大門開啟通往橋艙。\n\n開門動畫類似開場，開啟時會噴出蒸汽。每一扇門都綁定了 Door Steam VFX，根據門的移動速度生成粒子。"
+                },
+                {
+                    "Name": "InteractionVolume",
+                    "Description": "此 Volume 定義何時顯示 HUD 準星。透過 VFX Volume Mixer 的 <i>InteractionArea</i> 參數控制 HUD VFX 的可見度。\n\n（HUD VFX 實例位於 VirtualCameraManager Prefab 中）"
+                }
+            ]
+        },
+        {
+            "Name": "Bridge Room : HoloTable",
+            "UniqueKey": "Bridge Room : HoloTable",
+            "Description": "全息桌由多個通用元件組成，並包含一系列事件序列。\n\n主要元件如下：",
+            "Sections": [
+                {
+                    "Name": "Holographic Table Parallax Elements",
+                    "Description": "全息桌的實體網格使用不透明材質，但桌內顯示的物件並非真實模型，而是使用平面視差著色器渲染在透明平面上的假物件。"
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Idle PinScreen",
+            "UniqueKey": "HoloTable : Idle PinScreen",
+            "Description": "遊戲一開始，全息桌會播放針幕（Pin-Screen）的循環動畫。當玩家靠近時會中斷，進入下一個導覽狀態：星系導航。",
+            "Sections": [
+                {
+                    "Name": "Idle Pin Screen VFX",
+                    "Description": "與後續使用的針幕 VFX 相同，僅使用單一 Visual Effect，循環動畫由 Looping Timeline 控制。"
+                },
+                {
+                    "Name": "Going to the next State",
+                    "Description": "玩家進入觸發區後，狀態機會從 Idle 切換到下一狀態。"
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Solar System",
+            "UniqueKey": "HoloTable : Solar System",
+            "Description": "太陽系視圖讓玩家選擇降落行星，不同風險等級。高風險行星無法互動，選擇低/中風險才會進入下一狀態：尋找降落點。",
+            "Sections": [
+                {
+                    "Name": "Solar System View",
+                    "Description": "包含太陽、雲霧、小行星帶與數顆可互動行星。"
+                },
+                {
+                    "Name": "Next State : Finding Landing Site",
+                    "Description": "選定有效目標後，狀態機前進並播放過場動畫。"
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Galaxy View",
+            "UniqueKey": "HoloTable : Galaxy View",
+            "Description": "星系視圖是與全息桌互動的第一步，顯示星系特效、己方飛船位置與三個可互動的目的地。",
+            "Sections": [
+                {
+                    "Name": "Galaxy Elements",
+                    "Description": "啟動此狀態時，針幕會透過 Timeline 轉場為星系視圖。"
+                },
+                {
+                    "Name": "Interactive Items",
+                    "Description": "所有元素皆可互動。己方飛船僅顯示資訊，其餘三個目的地會有反應。"
+                },
+                {
+                    "Name": "Going to the Next State",
+                    "Description": "點選任一目的地（不管哪個），都會進入下一個階段並播放過場。"
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Landing Site",
+            "UniqueKey": "HoloTable : Landing Site",
+            "Description": "降落點狀態僅播放一段針幕動畫，顯示飛船即將降落的目標位置。",
+            "Sections": [
+                {
+                    "Name": "Landing Site Pin-Screen Sequence",
+                    "Description": "由 Timeline 驅動，動畫包含針幕與目標 VFX。降落點使用與星系路點相同的 VFX。\n\n此階段無需玩家操作，動畫結束後自動進入下一階段。"
+                },
+                {
+                    "Name": "Next State : Alert Mode",
+                    "Description": "動畫結束時警報響起，進入 Demo 最終階段——飛船遭受攻擊。"
+                }
+            ]
+        },
+        {
+            "Name": "Core Room Under Attack",
+            "UniqueKey": "Core Room Under Attack",
+            "Description": "核心室有一個大型特效，會在飛船遭受攻擊時受控變化。能量耗盡後核心會變形並最終崩毀。\n\n特效由兩個部分組成：核心本體 + 雙層環（重複使用），皆由 Timeline 控制。",
+            "Sections": [
+                {
+                    "Name": "Core Depletion Sequence.",
+                    "Description": "攻擊期間核心能量逐步耗盡直至崩毀。\n\n此序列由主 Alert Timeline 控制。"
+                },
+                {
+                    "Name": "Shake \"Missile\" Events",
+                    "Description": "每次飛彈命中會觸發強烈攝影機震動，同時啟動火花特效（參閱 Visual Effects 中的 \"Sparkle (Shake)\"）。\n\n預覽方式：\n1. 在 VFX Graph 中開啟實例 → Target GameObject 面板點擊 \"TakeHit\"\n2. 或直接播放 Core Hit Timeline"
+                },
+                {
+                    "Name": "Next State : Wrecked Room",
+                    "Description": "核心耗盡後，最後一發飛彈觸發劇烈震動與全黑。\n\n接著進入 Demo 的「殘破」階段。"
+                }
+            ]
+        },
+        {
+            "Name": "Wrecked Bridge Room",
+            "UniqueKey": "Wrecked Bridge Room",
+            "Description": "核心崩毀後關閉電源，最後一發飛彈擊中導致玩家昏厥。醒來時已身處被摧毀的橋艙。\n\n一段時間後玩家再次倒下，徹底昏迷，Demo 結束。",
+            "Sections": [
+                {
+                    "Name": "Effects in the Scene",
+                    "Description": "此場景充滿地面火焰、漂浮火花與煙霧熱變形混合。\n\n（若看不到火花，請點擊 Scene View 工具列的 \"(Cam)Game\" 按鈕切換追蹤模式）"
+                }
+            ]
+        },
+        {
+            "Name": "Fire Pool (Wrecked)",
+            "UniqueKey": "Fire Pool (Wrecked)",
+            "Description": "",
+            "Sections": [
+                {
+                    "Name": "Wrecked Fire Pool",
+                    "Description": "燃料灘燃燒的簡單火焰特效，使用翻書動畫渲染。為維持解析度一致，使用較少幀數但啟用 Motion Vector 插補混合。"
+                },
+                {
+                    "Name": "Floating Smoke / Ash / Distortion",
+                    "Description": "環境 VFX 以大量煙霧與熱變形填充場景。為減少過繪，使用 Camera Fade 與半解析度透明度。\n\n漂浮灰燼使用 Tile/Warp 技術實現無縫循環。"
+                }
+            ]
+        }
+    ]
+}

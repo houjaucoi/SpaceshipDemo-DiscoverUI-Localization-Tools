@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -25,107 +26,67 @@ public class DiscoverDataSO : ScriptableObject
         [TextArea(5, 50)] public string Description;
     }
 
-    [ContextMenu("Export Data To CSV")]
-    void ExportToCSV()
+    // ────────────────────────
+    // Right-click → Export to JSON
+    // ────────────────────────
+    [ContextMenu("Export Data To JSON")]
+    void ExportToJson()
     {
         string path = EditorUtility.SaveFilePanel(
-            "Export Discover Data to CSV",
+            "Export Discover Data to JSON",
             "Assets",
-            $"{name}.csv",
-            "csv");
+            $"{name}.json",
+            "json");
 
         if (string.IsNullOrEmpty(path)) return;
 
-        using var writer = new StreamWriter(path, false, new UTF8Encoding(true));
-        writer.WriteLine("Name,UniqueKey,Description,SectionsContent");
-
-        foreach (var c in discoverContents)
-        {
-            string sections = string.Join("\\n",
-                c.Sections.ConvertAll(s =>
-                    $"{EscapeCsv(s.Name)}:{EscapeCsv(s.Description)}"));
-
-            writer.WriteLine($"{EscapeCsv(c.Name)}," +
-                           $"{EscapeCsv(c.UniqueKey)}," +
-                           $"{EscapeCsv(c.Description)}," +
-                           $"{EscapeCsv(sections)}");
-        }
+        // 直接序列化整個 SO
+        string json = JsonUtility.ToJson(this, prettyPrint: true);
+        File.WriteAllText(path, json, System.Text.Encoding.UTF8);
 
         EditorUtility.DisplayDialog("Export Success",
             $"Exported {discoverContents.Count} entries to:\n{path}", "OK");
+
+        Debug.Log($"[Discover] JSON exported: {path}");
     }
 
-    [ContextMenu("Import Data From CSV")]
-    void ImportFromCSV()
+    // ────────────────────────
+    // Right-click → Import from JSON
+    // ────────────────────────
+    [ContextMenu("Import Data From JSON")]
+    void ImportFromJson()
     {
         string path = EditorUtility.OpenFilePanel(
-            "Import Discover Data from CSV", "Assets", "csv");
+            "Import Discover Data from JSON", "Assets", "json");
 
         if (string.IsNullOrEmpty(path)) return;
 
-        discoverContents.Clear();
-        var lines = File.ReadAllLines(path, Encoding.UTF8);
-
-        for (int i = 1; i < lines.Length; i++) // skip header
+        if (!File.Exists(path))
         {
-            var cols = ParseCsvLine(lines[i]);
-            if (cols.Length < 4) continue;
-
-            var content = new DiscoverContent
-            {
-                Name = cols[0],
-                UniqueKey = string.IsNullOrEmpty(cols[1]) ? cols[0] : cols[1],
-                Description = cols[2],
-                Sections = new List<SectionsContent>()
-            };
-
-            if (!string.IsNullOrWhiteSpace(cols[3]))
-            {
-                var pairs = cols[3].Split(new[] { "\\n" }, System.StringSplitOptions.None);
-                foreach (var p in pairs)
-                {
-                    var kv = p.Split(new[] { ':' }, 2);
-                    if (kv.Length != 2) continue;
-                    content.Sections.Add(new SectionsContent
-                    {
-                        Name = kv[0],
-                        Description = kv[1]
-                    });
-                }
-            }
-            discoverContents.Add(content);
+            EditorUtility.DisplayDialog("Error", "File not found!", "OK");
+            return;
         }
 
-        EditorUtility.SetDirty(this);
-        AssetDatabase.SaveAssets();
+        string json = File.ReadAllText(path, System.Text.Encoding.UTF8);
 
-        EditorUtility.DisplayDialog("Import Success",
-            $"Imported {discoverContents.Count} entries from:\n{path}", "OK");
-    }
-
-    private static string EscapeCsv(string s) =>
-        string.IsNullOrEmpty(s) ? "" : "\"" + s.Replace("\"", "\"\"") + "\"";
-
-    private static string[] ParseCsvLine(string line)
-    {
-        var result = new List<string>();
-        var sb = new StringBuilder();
-        bool inQuotes = false;
-
-        for (int i = 0; i < line.Length; i++)
+        try
         {
-            char c = line[i];
-            if (c == '"')
-            {
-                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
-                { sb.Append('"'); i++; }
-                else inQuotes = !inQuotes;
-            }
-            else if (c == ',' && !inQuotes)
-            { result.Add(sb.ToString()); sb.Clear(); }
-            else sb.Append(c);
+            // 直接反序列化到當前 SO
+            JsonUtility.FromJsonOverwrite(json, this);
+
+            EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssets();
+
+            EditorUtility.DisplayDialog("Import Success",
+                $"Imported {discoverContents.Count} entries from:\n{path}", "OK");
+
+            Debug.Log($"[Discover] JSON imported: {path}");
         }
-        result.Add(sb.ToString());
-        return result.ToArray();
+        catch (System.Exception e)
+        {
+            EditorUtility.DisplayDialog("Import Failed",
+                $"JSON format error:\n{e.Message}", "OK");
+            Debug.LogError($"[Discover] Import failed: {e}");
+        }
     }
 }

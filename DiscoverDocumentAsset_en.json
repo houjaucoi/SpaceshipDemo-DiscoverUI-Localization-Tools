@@ -1,0 +1,261 @@
+﻿{
+    "discoverContents": [
+        {
+            "Name": "How to build a Player",
+            "UniqueKey": "How to build a Player",
+            "Description": "If you want to build a player of the demo, you can access the Build frontend window using 'File/Build Frontend' menu item.\n\nUpon opening the window, select the build profile you want, then click the 'Build Selected' or '+Run' button to build and optionally run the build once it's ready.",
+            "Sections": []
+        },
+        {
+            "Name": "Spaceship Demo",
+            "UniqueKey": "Spaceship Demo",
+            "Description": "This set of Scenes contains the whole gameplay walkthrough for the Spaceship Demo. This window will guide you through all the stages of the demo, and will let you access elements that compose the demo.\n\n<i>If this information is displayed in the inspector, you can navigate more easily using the 'Help/Discover Spaceship Demo'</i>",
+            "Sections": [
+                {
+                    "Name": "Navigating the Walkthrough",
+                    "Description": "Click the list items in the left part of the window in order to access various sections of the discovery of this scene.\n\nThe navigation is split between different sections:\n\n<b>Demo Scripted Events</b> is the category that define the walktrhough from the start to the end of the demo.\n\n<b>Visual Effects</b> is the section where all other things related to VFX will be present. There are some generic effects and systems that you will find around, here is a list of points of interest."
+                }
+            ]
+        },
+        {
+            "Name": "Floating Dust",
+            "UniqueKey": "Floating Dust",
+            "Description": "In order to thicken the atmosphere, lit floating dust is spawned around the player and change as the player evolves through the level.",
+            "Sections": [
+                {
+                    "Name": "Floating Dust",
+                    "Description": "This effect spawns particles arount the player's camera. It is automatically bound to the Main Camera in the graph so there's no configuration required."
+                },
+                {
+                    "Name": "VFXVolumeMixer Setup",
+                    "Description": "Volumes are set so the floating dust changes its ambient color, density and opacity throughout the level. "
+                }
+            ]
+        },
+        {
+            "Name": "Other Ambient Effects",
+            "UniqueKey": "Other Ambient Effects",
+            "Description": "Ambient Effects are used to add dynamics to the scene, making it credible and lively. The spaceship is populated with many of these around.",
+            "Sections": [
+                {
+                    "Name": "Root objects for every Room",
+                    "Description": "Every set of effects is sorted using a root game object"
+                }
+            ]
+        },
+        {
+            "Name": "Steam Leaks",
+            "UniqueKey": "Steam Leaks",
+            "Description": "Steam leaks are a pretty straightfowrard effects that blow some air particles out of worn and damaged air ducts.\n\nThese effects are using a simplified lighting model using light probes",
+            "Sections": [
+                {
+                    "Name": "Steam Leak (Directional)",
+                    "Description": "A simple effect with two emitters."
+                }
+            ]
+        },
+        {
+            "Name": "Sparkles (Shake)",
+            "UniqueKey": "Sparkles (Shake)",
+            "Description": "The gameplay periodically sends shakes to the scene using broadcast messages.\nEvery shake can be caught by objects in order to be processed.\n\nIn order to spawn sparkles efficiently, we implemented a system with a multiple source effect in a single simulation for sparkles.",
+            "Sections": [
+                {
+                    "Name": "The Shake Sparkle Effect (for the First Corridor)",
+                    "Description": "This effect is a special blend of the Sparkle effect with very few features (no collision, fewer particles, no noise).\n\nInstead, every instance is fed with a list of transforms that are set using a parameter binder.\n"
+                }
+            ]
+        },
+        {
+            "Name": "Big Sparkle Bursts",
+            "UniqueKey": "Big Sparkle Bursts",
+            "Description": "In the corridors are placed some big sparkle burst effects. These are not responding to the shake events but instead spawn particles on their own.",
+            "Sections": [
+                {
+                    "Name": "Sparkle Effects",
+                    "Description": "A simple sparkle effect with synchornized emission. The emission is controlled externally by a game object that sends:\n- A VFX Event\n- An Audio source random play\n- A toggle for a spotlight (spotlight turns itself off after flashing)"
+                }
+            ]
+        },
+        {
+            "Name": "Intro : Elevator",
+            "UniqueKey": "Intro : Elevator",
+            "Description": "The elevator introduction introduces the player to the spaceship environment.\nWhile it's not a playable section, it's initializing the HUD of the player and performs some animation in a timeline.",
+            "Sections": [
+                {
+                    "Name": "Intro Timeline",
+                    "Description": "The intro timeline gathers all animation, audio and script for the introduction of the sequence."
+                },
+                {
+                    "Name": "Animated Door (Intro Specific)",
+                    "Description": "The door animation is called by script from a generic template. \nIt spawns particles upon opening, using a Visual Effect attached to each door.\nIn order to control the spawn and the velocity of the particles, the VFX uses a Spawn Over Distance block that computes the velocity of the doors based on the timeline animation."
+                },
+                {
+                    "Name": "HUD Activation",
+                    "Description": "The HUD of the player is also made of particles.\n\nDuring the introduction, the timeline broadcasts a message that is caught by the VirtualCameraManager.\n\nUpon recieving the message, the <b>InitSequence</b> event is sent to the Visual Effect in order to spawn the text and the highlights of the meshes in the scene."
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Alert",
+            "UniqueKey": "HoloTable : Alert",
+            "Description": "Alert Mode is the final stage of the walkthrough. During this 30 second state, missiles will hit the ship, and the holographic table will display an overview of the battle between the player's ship and its attackers.\n\nThe sequence ends with a big hit, fading to black.",
+            "Sections": [
+                {
+                    "Name": "Alert Sequence",
+                    "Description": "The Alert Sequence cuts abruptly the landing site search sequence to display a map of the battle between our ship, and its attackers.\n\nThe Environment is split through 2 Visual effects, that are gathered into one Main VFX one for the grid, one for the clouds and asteroids. This is intended for readability.\n\nShips are different configuration of the ARUI-Battleship VFX with different targets."
+                },
+                {
+                    "Name": "Destructibles",
+                    "Description": "During the attack sequence, some props are activated to simulate wreck in the bridge room. The sequencing happens using a state machine that will act as an activator of other state machines. Every time a HIT_STRONG message is sent by the main timeline (missile hit), the Destructible State machine advances one state, enabling more havoc.\nThree main Destructibles are placed into the scene:\n- Falling Cables (Torn upon activation, react to shake and spawn periodically particles)\n- Falling Plates (Only Rigid Bodies)\n- Steam Leak Bursts (Composed of one Single Spark + Scaled Steam Leak)"
+                },
+                {
+                    "Name": "In Parallel : Core Room",
+                    "Description": "During this attack sequence, the core, at the end of the corridor depletes, then collapses. The following section depicts the mechanisms used to be in sync with this sequence."
+                }
+            ]
+        },
+        {
+            "Name": "Security Terminal",
+            "UniqueKey": "Security Terminal",
+            "Description": "After the First Corridor, you encounter your first interaction at the security terminal.\n\nThere is an interactive item at the center of the room. When approaching this interactive item, the HUD crosshair becomes visible, and the light dot can be selected.",
+            "Sections": [
+                {
+                    "Name": "Interactive Item",
+                    "Description": "The Small dot in midair is an interactive element that is reactive to the Player Controller. When hovering with the crosshair, it triggers an animation and a state change. The visuals are made of a Visual Effect with a boolean property (ARUI-Hover)"
+                },
+                {
+                    "Name": "Security Terminal Sequence",
+                    "Description": "The Security Terminal Sequence starts upon activation of the Interactive Item.\n\nIt is a timeline sequence that activates many Effects.\n"
+                },
+                {
+                    "Name": "Door Openning (After Sequence)",
+                    "Description": "When the sequence is finished, the Door on the right opens to provide access to the Bridge Room.\n\nThe door animation is close to the introduction sequence animation, and reveals a steam effect upon opening. A  Door Steam VFX is triggered and spawns particles accordingly to each door movement."
+                },
+                {
+                    "Name": "InteractionVolume",
+                    "Description": "The Interaction Volume defines which area will enable the visibility of the HUD Crosshair of the player. It uses the VFX Volume Mixer <i>InteractionArea</i> parameter to set the value in the HUD VFX.\n\n(The HUD VFX is instanced in the VirtualCameraManager prefab)"
+                }
+            ]
+        },
+        {
+            "Name": "Bridge Room : HoloTable",
+            "UniqueKey": "Bridge Room : HoloTable",
+            "Description": "The Holographic Table is made of a common setup of elements, and sequences of events.\n\nThe common elements are the following:",
+            "Sections": [
+                {
+                    "Name": "Holographic Table Parallax Elements",
+                    "Description": "While the mesh of the hologrpahic table is made of a solid, opaque material. The items visible inside the table are not actual items. They are rendered using a planar parallax shader applied to an inviible plane over the surface of the table."
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Idle PinScreen",
+            "UniqueKey": "HoloTable : Idle PinScreen",
+            "Description": "At the beginning of the Gameplay, The Holographic table displays a looping animation of the pin-screen. This animation will be interrupted when the player comes close to the table. Triggering the next state of the walkthrough : Galaxy Navigation.",
+            "Sections": [
+                {
+                    "Name": "Idle Pin Screen VFX",
+                    "Description": "The Idle Pin Screen VFX is the same as the one used later in the sequence. It is using a single Visual Effect and the whole looping animation is sequenced using a looping timeline."
+                },
+                {
+                    "Name": "Going to the next State",
+                    "Description": "Upon Entering the Trigger, the player triggers the state change of the State Machine from "
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Solar System",
+            "UniqueKey": "HoloTable : Solar System",
+            "Description": "Solar System View lets the player choose a planet where to land with different degrees of risk. High risk planets cannot be interacted, Selecting Low and Medium Risk will advance the walkthrough to the next State : Finding Landing Location.",
+            "Sections": [
+                {
+                    "Name": "Solar System View",
+                    "Description": "This view is composed of a sun, Clouds and Asteroid Belts and a set of interactive planets."
+                },
+                {
+                    "Name": "Next State : Finding Landing Site",
+                    "Description": "Upon selecting a valid target, the State machine advances to the next state and performs a transition."
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Galaxy View",
+            "UniqueKey": "HoloTable : Galaxy View",
+            "Description": "Galaxy View is the first step of the interactions with the holographic table. It presents a galaxy effect with the ship position and three interactive destination elements.",
+            "Sections": [
+                {
+                    "Name": "Galaxy Elements",
+                    "Description": "Upon activating this state, the pin-screen transitions to galaxy view using a timeline."
+                },
+                {
+                    "Name": "Interactive Items",
+                    "Description": "Every of the elements is interactive. While the Player Ship's interaction does not lead to anything besides displaying its information. The other three elements (destination) react to activating them."
+                },
+                {
+                    "Name": "Going to the Next State",
+                    "Description": "By selecting one of the three (whatever it is), the navigation advances to the next stage. Playing a transition timeline."
+                }
+            ]
+        },
+        {
+            "Name": "HoloTable : Landing Site",
+            "UniqueKey": "HoloTable : Landing Site",
+            "Description": "Landing Site State is a plain animation of the Pin-Screen with a target that will define where the ship needs to land.",
+            "Sections": [
+                {
+                    "Name": "Landing Site Pin-Screen Sequence",
+                    "Description": "This simple sequence is driven by a timeline in order to animate the pin-screen and the target VFX. The landing site is displayed using the same VFX as galaxy waypoints.\n\nNo interaction from the player is required from this point. The next stage is triggered at the end of the timeline."
+                },
+                {
+                    "Name": "Next State : Alert Mode",
+                    "Description": "At the end of the animation, an alarm rings and the player enters the final stage of the demo. Ship is being under attack."
+                }
+            ]
+        },
+        {
+            "Name": "Core Room Under Attack",
+            "UniqueKey": "Core Room Under Attack",
+            "Description": "The core room holds one big effect that is controlled and animated during the attack of the spaceship. While the energy depletes, the core will modify its shape until it collapses.\n\nThe effect is made of two distinct effects : Core and Rings (used twice), it's controlled using a timeline.",
+            "Sections": [
+                {
+                    "Name": "Core Depletion Sequence.",
+                    "Description": "During the Attack, core energy depletes until the core collapses.\nThis sequence is orchestrated in a timeline that is controlled by the main timeline of the Alert."
+                },
+                {
+                    "Name": "Shake \"Missile\" Events",
+                    "Description": "During the attack, big camera shake happen for each missile impact. It triggers the sparkles (see \"Sparkle (Shake)\" section in Visual Effects). \n\nIn order to preview these events, you can either open the VFX Graph instance using the \"Edit\"button next to the field in the inspector, then, in the Target GameObject panel of VFX Graph use the \"TakeHit\" Send Button.\nOr you can use the Core Hit Timeline that controls both events and parameters."
+                },
+                {
+                    "Name": "Next State : Wrecked Room",
+                    "Description": "Once core is depleted, a final missile triggers a huge camera shake, followed by a blackout.\n\nThen starts the Wrecked part of the demo."
+                }
+            ]
+        },
+        {
+            "Name": "Wrecked Bridge Room",
+            "UniqueKey": "Wrecked Bridge Room",
+            "Description": "After Collapsing, the core shuts down and a final missile hit blacks out the player. Then, the player wakes in a destroyed version of the bridge room.\n\nAfter some delay, the player collapses again then blacks out for good, ending the demo.",
+            "Sections": [
+                {
+                    "Name": "Effects in the Scene",
+                    "Description": "The scene here is populated with fires on the ground, floating sparkles and a blend of smoke and heat deformation.\n\n(If you cannot see the Sparkles, please use the \"(Cam)Game\" Button on the additional Scene View toolbar to toggle Game view tracking."
+                }
+            ]
+        },
+        {
+            "Name": "Fire Pool (Wrecked)",
+            "UniqueKey": "Fire Pool (Wrecked)",
+            "Description": "",
+            "Sections": [
+                {
+                    "Name": "Wrecked Fire Pool",
+                    "Description": "A Simple Effect of flames going out of a burning fuel Puddle. Flames are rendered as flipbook. In order to keep consistent resolution, less frames are used but instead blend using Motion Vector flipbook interpolation."
+                },
+                {
+                    "Name": "Floating Smoke / Ash / Distortion",
+                    "Description": "Ambient VFX Here fills the scene with big smoke and distortion. In order to reduce overdraw, Camera Fade and Half Resolution Translucency is used.\n\nFloating ashes also use Tile/Warp in order to loop around camera."
+                }
+            ]
+        }
+    ]
+}
