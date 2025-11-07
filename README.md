@@ -1,0 +1,2 @@
+# SpaceshipDemo-DiscoverUI-Localization-Tools
+把Unity的SpaceshipDemo範例中Discover UI的"Discover"分頁改成其他文字的工具
